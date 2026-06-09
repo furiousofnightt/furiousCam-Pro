@@ -10,6 +10,7 @@
   [![Download App](https://img.shields.io/badge/📲%20DOWNLOAD%20APP-005CED?style=for-the-badge&logoColor=white)](https://furiouscam.pythonanywhere.com/)
   [![Python](https://img.shields.io/badge/Python-3.9+-3776ab?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
   [![Windows](https://img.shields.io/badge/Windows-10%2B-0078d4?style=flat-square&logo=windows&logoColor=white)](https://www.microsoft.com/windows/)
+  [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](LICENSE)
   [![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat-square)](.)
   
 </div>
@@ -17,6 +18,11 @@
 ---
 
 ## 🎯 O que é FuriousCam Pro?
+
+**FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
+
+Licenciado sob Apache 2.0.
+
 
 **FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
 
