@@ -21,10 +21,7 @@
 
 **FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
 
-Licenciado sob Apache 2.0.
-
-
-**FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
+Licenciado sob Apache License 2.0.
 
 ### ✨ Principais Características
 
@@ -706,7 +703,7 @@ logger.warning("Algo suspeito detectado")
 
 ## 📄 Licença
 
-Projeto pessoal de Diego. Sem licença específica (propriedade privada).
+FuriousCam Pro é licenciado sob Apache License 2.0. Consulte o arquivo `LICENSE` para os termos completos.
 
 ---
 
