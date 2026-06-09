@@ -742,7 +742,6 @@ FuriousCam Pro está finalizado com a versão `2.0` como entrega completa. Não 
 - **Scrcpy team** — Pela tecnologia base
 - **PySide6/Qt** — Framework UI moderno
 - **FFmpeg** — Decode potente
-- **Comunidade open-source** — Inspiração e ferramentas
 
 ---
 
