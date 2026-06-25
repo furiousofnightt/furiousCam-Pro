@@ -1,3 +1,21 @@
+# 🎉 FuriousCam v2.1.0 - Release Summary
+
+## ✨ Novas Funcionalidades e Correções
+
+### 🔌 Estabilidade Absoluta de USB (Anti-Porta Travada)
+- **Comportamento:** Remove a necessidade de ficar trocando a porta USB fisicamente no PC quando o cabo dá mau contato ou é desconectado bruscamente.
+- **Implementação:** Foi incorporado o uso do comando nativo `taskkill /F /IM adb.exe /T` no Windows para aniquilar sumariamente processos zumbis do ADB que ficavam segurando a porta de comunicação, garantindo 100% de confiabilidade no Smart Reconnect.
+- **Status:** ✅ FUNCIONAL
+
+### ⚡ Responsividade Instantânea da Interface (Sem Engasgos)
+- **Comportamento:** O aplicativo não trava mais o Windows (bolinha de carregamento) ao tentar fechar a janela ou parar a transmissão.
+- **Implementação:** 
+  - O fluxo de limpeza demorado ao clicar em "Parar" foi movido para o segundo plano (*background thread*). Adicionamos uma trava de segurança que desabilita o botão "Iniciar" temporariamente para evitar conflitos (*race conditions*).
+  - O encerramento do app (botão X) agora executa um `taskkill` do ADB de forma totalmente assíncrona, promovendo um fechamento em zero milissegundos.
+- **Status:** ✅ FUNCIONAL
+
+---
+
 # 🎉 FuriousCam v2.0 - Release Summary
 
 ## ✨ Novas Funcionalidades

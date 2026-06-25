@@ -206,8 +206,8 @@ class AppCore(QObject):
     # ─────────────────────────────
     #  OBS Virtual Camera
     # ─────────────────────────────
-    def enable_virtual_cam(self, width: int = None, height: int = None) -> bool:
-        """Start pushing frames into OBS Virtual Camera."""
+    def enable_virtual_cam(self, width: int = None, height: int = None, backend: str = None) -> bool:
+        """Start pushing frames into Virtual Camera."""
         try:
             from obs.virtual_cam import VirtualCamOutput
         except ImportError:
@@ -235,7 +235,7 @@ class AppCore(QObject):
             w = width
             h = height
 
-        self._virtual_cam = VirtualCamOutput(width=w, height=h, fps=self.fps)
+        self._virtual_cam = VirtualCamOutput(width=w, height=h, fps=self.fps, preferred_backend=backend)
         ok = self._virtual_cam.start()
         if ok:
             self._virtual_cam_enabled = True
@@ -245,7 +245,7 @@ class AppCore(QObject):
             self._virtual_cam_thread.start()
             logger.info("OBS Virtual Camera output started.")
         else:
-            self.connection_status.emit("Erro: OBS Virtual Camera não disponível.")
+            self.connection_status.emit("Aviso: OBS Virtual Camera não disponível.")
         return ok
 
     def disable_virtual_cam(self):
@@ -512,39 +512,57 @@ class AppCore(QObject):
                 vr.first_pts_wall = vr.last_pts_wall
 
     def stop_connection(self):
-        """Stop stream and cleanup device-side resources, but keep ADB server running.
-        Used during normal operation (WiFi operations, hot-swap, manual stop button)."""
+        """Stop stream and cleanup device-side resources, and kill the ADB server.
+        Used during normal operation (WiFi operations, manual stop button)."""
         self.running = False
         self._reconnecting = False
         self.disable_virtual_cam()
         self.video_receiver.stop()
         if hasattr(self, 'audio_receiver'):
             self.audio_receiver.stop()
-        self.adb_manager.cleanup_server_on_device()  # Clean up server on Android device
-        self.adb_manager.cleanup()  # Remove port forwarding
-        self.adb_manager.device_serial = None  # Reset device serial for fresh detection next time
-        # NÃO zera wifi_fallback_ip aqui — é preciso para reconectar via Wi-Fi ao clicar em Iniciar novamente.
-        # É zerado apenas explicitamente ao retornar para USB (action_return_to_usb).
-        self._headset_monitor_active = False  # Para o monitor de headset
+            
+        def _background_cleanup():
+            self.adb_manager.cleanup_server_on_device()  # Clean up server on Android device
+            self.adb_manager.cleanup()  # Remove port forwarding
+            self.adb_manager.stop_adb_server() # Mata o daemon do ADB para garantir USB limpo e zerado
+            self.adb_manager.device_serial = None  # Reset device serial for fresh detection next time
+            # NÃO zera wifi_fallback_ip aqui — é preciso para reconectar via Wi-Fi ao clicar em Iniciar novamente.
+            # É zerado apenas explicitamente ao retornar para USB (action_return_to_usb).
+            self._headset_monitor_active = False  # Para o monitor de headset
 
-        # Log de resumo da sessão ao parar
-        if self._session_start_time > 0:
-            duration_s = int(time.time() - self._session_start_time)
-            duration_str = f"{duration_s // 60}m{duration_s % 60:02d}s"
-            logger.info(
-                f"[Sessão encerrada] Durou {duration_str} | "
-                f"{self._session_total_frames} frames entregues | "
-                f"{self._resolution} @ {self.fps}fps"
-            )
-            self._session_start_time = 0.0
+            # Log de resumo da sessão ao parar
+            if self._session_start_time > 0:
+                duration_s = int(time.time() - self._session_start_time)
+                duration_str = f"{duration_s // 60}m{duration_s % 60:02d}s"
+                logger.info(
+                    f"[Sessão encerrada] Durou {duration_str} | "
+                    f"{self._session_total_frames} frames entregues | "
+                    f"{self._resolution} @ {self.fps}fps"
+                )
+                self._session_start_time = 0.0
 
-        self.connection_status.emit("Desconectado e pronto para próxima execução.")
+            self.connection_status.emit("Desconectado e pronto para próxima execução.")
+
+        # Rodar o cleanup pesado em thread para não travar a UI (evitar a bolinha do Windows)
+        threading.Thread(target=_background_cleanup, daemon=True).start()
 
     def cleanup_on_exit(self):
-        """Full cleanup when app is closing. Stops everything including ADB server.
+        """Full cleanup when app is closing. Stops everything fast.
         Only call this from closeEvent()."""
-        self.stop_connection()
-        self.adb_manager.stop_adb_server()  # Kill ADB server completely - ONLY on app exit
+        self.running = False
+        self._reconnecting = False
+        self.disable_virtual_cam()
+        self.video_receiver.stop()
+        if hasattr(self, 'audio_receiver'):
+            self.audio_receiver.stop()
+            
+        # Ao fechar o app, não precisamos esperar o Android finalizar graciosamente,
+        # basta matar o processo do adb de forma assíncrona para a janela fechar instantaneamente.
+        import subprocess
+        if os.name == 'nt':
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            subprocess.Popen(["taskkill", "/F", "/IM", "adb.exe", "/T"], startupinfo=si)
 
     def connect_via_wifi_serial(self, ip_with_port: str):
         """Informa ao AppCore que a próxima conexão deve usar o IP Wi-Fi já estabelecido."""

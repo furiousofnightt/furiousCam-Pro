@@ -469,7 +469,44 @@ class MainWindow(QMainWindow):
         obs_status_action.setDefaultWidget(self.lbl_obs_status)
         self._settings_menu.addAction(obs_status_action)
         self._settings_menu.addSeparator()
+
+        # Unity Capture (Experimental)
+        unity_action, self.btn_unity = _make_action_widget(icons.SVG_CAST, "#ffd54f", "Câmera Virtual (Streamlabs / Web)", checkable=True)
+        self.btn_unity.clicked.connect(self._toggle_unity)
+        self.btn_unity.setEnabled(False)
+        self._settings_menu.addAction(unity_action)
+
+        self.lbl_unity_status = QLabel("  Câmera Universal: inativo")
+        self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px; padding: 0 12px 2px 12px;")
+        unity_status_action = QWidgetAction(self._settings_menu)
+        unity_status_action.setDefaultWidget(self.lbl_unity_status)
+        self._settings_menu.addAction(unity_status_action)
+
+        # Botão "Gerenciar driver..." — sempre visível, abre install/uninstall dialog
+        # Solução definitiva: right-click não funciona dentro de QMenu no Qt
+        self.btn_unity_manage = QPushButton(" Gerenciar driver Universal...")
+        self.btn_unity_manage.setIcon(icons.get_icon(icons.SVG_GEAR, "#888", 16))
+        self.btn_unity_manage.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                border: none;
+                color: #555;
+                font-size: 9px;
+                text-align: left;
+                padding: 2px 12px 6px 12px;
+                min-width: 210px;
+            }
+            QPushButton:hover { color: #ffd54f; background: transparent; }
+        """)
+        self.btn_unity_manage.setCursor(Qt.PointingHandCursor)
+        self.btn_unity_manage.clicked.connect(self._show_unity_install_dialog)
+        unity_manage_action = QWidgetAction(self._settings_menu)
+        unity_manage_action.setDefaultWidget(self.btn_unity_manage)
+        self._settings_menu.addAction(unity_manage_action)
+        self._settings_menu.addSeparator()
+
         
+
         # Camera Window
         cam_win_action, self.btn_camera_window = _make_action_widget(icons.SVG_WINDOW, "#90caf9", "Janela Flutuante de Câmera", checkable=True)
         self.btn_camera_window.clicked.connect(self._toggle_camera_window)
@@ -1205,7 +1242,15 @@ class MainWindow(QMainWindow):
 
     def _toggle_obs(self, checked: bool):
         if checked:
-            ok = self.core.enable_virtual_cam()
+            # Garante que o Unity Capture esteja desativado antes de ativar OBS
+            if self.btn_unity.isChecked():
+                self.btn_unity.setChecked(False)
+                self.core.disable_virtual_cam()
+                self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+                self.lbl_unity_status.setText("Câmera Universal: inativo")
+                self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px;")
+            # Usa backend='obs' estrito: não cai em unitycapture mesmo que esteja instalado
+            ok = self.core.enable_virtual_cam(backend="obs")
             if ok:
                 self.btn_obs.setText(" Desativar Câmera Virtual")
                 self.lbl_obs_status.setText("Ativo — disponível no OBS Studio")
@@ -1214,13 +1259,71 @@ class MainWindow(QMainWindow):
                 self.btn_obs.setChecked(False)
                 self.lbl_obs_status.setText("Câmera Virtual não encontrada")
                 self.lbl_obs_status.setStyleSheet("color: #ff5252; font-size: 9px; padding: 0 12px 4px 30px;")
-                # Show install guide dialog
                 self._show_install_dialog()
         else:
             self.core.disable_virtual_cam()
             self.btn_obs.setText(" Ativar Câmera Virtual")
             self.lbl_obs_status.setText("OBS Virtual Camera: inativo")
             self.lbl_obs_status.setStyleSheet("color: #444; font-size: 9px;")
+
+    def _toggle_unity(self, checked: bool):
+        """Ativa/desativa o Unity Capture como câmera virtual (Experimental).
+        Comportamento:
+          - Driver instalado: funciona como toggle igual ao botão OBS.
+          - Driver não instalado: abre dialog de instalação e, após fechar,
+            tenta ativar automaticamente (se o usuário instalou).
+        """
+        if checked:
+            # Garante que o OBS esteja desativado antes de ativar o Unity
+            if self.btn_obs.isChecked():
+                self.btn_obs.setChecked(False)
+                self.core.disable_virtual_cam()
+                self.btn_obs.setText(" Ativar Câmera Virtual")
+                self.lbl_obs_status.setText("OBS Virtual Camera: inativo")
+                self.lbl_obs_status.setStyleSheet("color: #444; font-size: 9px;")
+
+            ok = self.core.enable_virtual_cam(backend="unitycapture")
+            if ok:
+                self.btn_unity.setText(" Desativar Câmera Universal")
+                self.lbl_unity_status.setText("Ativo — Unity Video Capture")
+                self.lbl_unity_status.setStyleSheet("color: #ffd54f; font-size: 9px; padding: 0 12px 4px 30px;")
+            else:
+                # Driver não encontrado: mantém botão desmarcado e abre instalador
+                self.btn_unity.setChecked(False)
+                self.lbl_unity_status.setText("Driver não instalado. Instale para usar.")
+                self.lbl_unity_status.setStyleSheet("color: #ff5252; font-size: 9px; padding: 0 12px 4px 30px;")
+                # Abre dialog e, se o usuário instalou, tenta ativar automaticamente ao fechar
+                self._show_unity_install_dialog(try_activate_after=True)
+        else:
+            self.core.disable_virtual_cam()
+            self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+            self.lbl_unity_status.setText("  Câmera Universal: inativo")
+            self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px; padding: 0 12px 2px 12px;")
+
+    def _show_unity_install_dialog(self, try_activate_after: bool = False):
+        """Abre o dialog de instalação/remoção do driver Unity Capture.
+        Se try_activate_after=True, tenta ativar a câmera após fechar o dialog.
+        """
+        from ui.install_dialog import UnityCaptureInstallDialog
+        # Salva em self para não ser coletado pelo Garbage Collector
+        self._unity_dlg = UnityCaptureInstallDialog(parent=self, base_path=self.core.base_path)
+
+        if try_activate_after:
+            def on_finished():
+                ok = self.core.enable_virtual_cam(backend="unitycapture")
+                if ok:
+                    self.btn_unity.setChecked(True)
+                    self.btn_unity.setText(" Desativar Câmera Universal")
+                    self.lbl_unity_status.setText("Ativo — Unity Video Capture")
+                    self.lbl_unity_status.setStyleSheet("color: #ffd54f; font-size: 9px; padding: 0 12px 2px 30px;")
+                else:
+                    self.lbl_unity_status.setText("  Driver não detectado. Reinicie o Windows e tente novamente.")
+                    self.lbl_unity_status.setStyleSheet("color: #888; font-size: 9px; padding: 0 12px 2px 12px;")
+            self._unity_dlg.finished.connect(on_finished)
+
+        # open() abre como modal mas não bloqueia o event loop do ADB
+        self._unity_dlg.open()
+
 
     def _toggle_camera_window(self, checked: bool):
         """Abre ou fecha a janela flutuante de câmera."""
@@ -1267,16 +1370,20 @@ class MainWindow(QMainWindow):
 
     def _show_install_dialog(self):
         from ui.install_dialog import VirtualCamInstallDialog
-        dlg = VirtualCamInstallDialog(self)
-        dlg.exec()
-        # After dialog closes, update the label to guide user
-        self.lbl_obs_status.setText("Após instalar, reinicie e tente novamente.")
-        self.lbl_obs_status.setStyleSheet("color: #888; font-size: 9px;")
+        self._obs_dlg = VirtualCamInstallDialog(self)
+        
+        def on_finished():
+            # After dialog closes, update the label to guide user
+            self.lbl_obs_status.setText("Após instalar, reinicie e tente novamente.")
+            self.lbl_obs_status.setStyleSheet("color: #888; font-size: 9px;")
+            
+        self._obs_dlg.finished.connect(on_finished)
+        self._obs_dlg.open()
 
     def _show_vbcable_install_dialog(self):
         from ui.install_dialog import VBCableInstallDialog
-        dlg = VBCableInstallDialog(self)
-        dlg.exec()
+        self._vbcable_dlg = VBCableInstallDialog(self)
+        self._vbcable_dlg.open()
 
     def _open_log_viewer(self):
         """Abre (ou foca) o visualizador de logs em tempo real."""
@@ -1323,6 +1430,7 @@ class MainWindow(QMainWindow):
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.btn_obs.setEnabled(True)
+        self.btn_unity.setEnabled(True)
         self.btn_camera_window.setEnabled(True)
         self.combo_camera.setEnabled(False)
         self.combo_fps.setEnabled(False)
@@ -1332,13 +1440,19 @@ class MainWindow(QMainWindow):
         self.core.start_connection()
 
     def on_stop_clicked(self):
-        self.btn_start.setEnabled(True)
+        self.btn_start.setEnabled(False) # Keep disabled until background cleanup finishes!
         self.btn_stop.setEnabled(False)
         self.btn_obs.setEnabled(False)
         self.btn_obs.setChecked(False)
         self.btn_obs.setText(" Ativar Câmera Virtual")
         self.lbl_obs_status.setText("OBS Virtual Camera: inativo")
         self.lbl_obs_status.setStyleSheet("color: #444; font-size: 9px;")
+        # Unity Capture — desativar e resetar
+        self.btn_unity.setEnabled(False)
+        self.btn_unity.setChecked(False)
+        self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+        self.lbl_unity_status.setText("  Câmera Universal: inativo  ·  clique direito para gerenciar driver")
+        self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px; padding: 0 12px 4px 12px;")
         # Fechar janela de câmera se estiver aberta
         self.btn_camera_window.setEnabled(False)
         self.btn_camera_window.setChecked(False)
@@ -1434,6 +1548,9 @@ class MainWindow(QMainWindow):
             # Now override the 'Aguardando Câmera...' message set by on_stop_clicked()
             self.lbl_status.setText(msg)
             self.video_widget.set_status(msg)
+            
+            # Re-enable the start button once the backend has fully disconnected
+            self.btn_start.setEnabled(True)
             
             # If it was interrupted (e.g. by native Camera app), show a dialog
             if "interrompida" in msg:

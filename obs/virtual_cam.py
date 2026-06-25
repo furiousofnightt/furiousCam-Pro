@@ -31,10 +31,11 @@ class VirtualCamOutput:
     Compatible with OBS Studio, Streamlabs, Discord, Zoom, Google Meet.
     """
 
-    def __init__(self, width: int = 1920, height: int = 1080, fps: int = 30):
+    def __init__(self, width: int = 1920, height: int = 1080, fps: int = 30, preferred_backend: str = None):
         self.width = width
         self.height = height
         self.fps = fps
+        self.preferred_backend = preferred_backend
         self._cam = None
         self._running = False
         self._backend_used = None
@@ -67,8 +68,10 @@ class VirtualCamOutput:
         self.height = height or self.height
         self.fps    = fps    or self.fps
 
+        backends_to_try = [self.preferred_backend] if self.preferred_backend else _BACKENDS_TO_TRY
+
         # Try each backend in order until one works
-        for backend in _BACKENDS_TO_TRY:
+        for backend in backends_to_try:
             try:
                 self._cam = pyvirtualcam.Camera(
                     width=self.width,
@@ -88,7 +91,17 @@ class VirtualCamOutput:
             except Exception as e:
                 logger.warning(f"Backend '{backend}' failed: {e}")
 
-        # All backends failed — try without specifying backend (last resort)
+        # Se um backend específico foi solicitado e falhou, NÃO faz fallback.
+        # Isso garante que unitycapture retorne False quando o driver não está instalado,
+        # mesmo que OBS esteja disponível.
+        if self.preferred_backend:
+            logger.error(
+                f"Requested backend '{self.preferred_backend}' not available. "
+                "No fallback applied (strict backend mode)."
+            )
+            return False
+
+        # All generic backends failed — try without specifying backend (last resort)
         try:
             self._cam = pyvirtualcam.Camera(
                 width=self.width,

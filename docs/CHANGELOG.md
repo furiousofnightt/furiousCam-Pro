@@ -4,6 +4,27 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [2.1.0] — 2026-06-15
+
+### ✨ Adicionado & Otimizado
+
+#### Estabilidade Absoluta de Conexão USB (Anti-Zumbi)
+- **Comportamento:** O aplicativo agora elimina sumariamente qualquer processo `adb.exe` que fique "pendurado" no Windows (zumbi), resolvendo o problema de ter que trocar de porta USB fisicamente quando o cabo dava mau contato.
+- **Arquivos:** `core/adb_manager.py`
+- **Detalhes:** 
+  - Adicionado o comando nativo `taskkill /F /IM adb.exe /T` na rotina de parada do servidor ADB.
+  - O sistema de Smart Reconnect agora usa essa limpeza profunda a cada tentativa, garantindo que o socket USB seja sempre liberado para uma reconexão limpa.
+
+#### Responsividade da Interface (Sem Travamentos ao Fechar/Parar)
+- **Comportamento:** A janela principal do aplicativo não engasga, não pisca e não mostra a "bolinha de carregamento" do Windows ao clicar em Parar ou ao tentar fechar o app.
+- **Arquivos:** `core/app_core.py`, `ui/main_window.py`
+- **Detalhes:**
+  - O processamento lento de limpeza e comunicação com o celular no botão **Parar** foi movido para uma *background thread* (segundo plano).
+  - Bloqueio inteligente da interface: o botão "Iniciar" fica desativado automaticamente até que a thread de limpeza confirme que o ADB e o celular foram 100% desligados, evitando *race conditions*.
+  - O fechamento da janela (botão X) agora executa um `taskkill` de forma 100% assíncrona, resultando num encerramento instantâneo do aplicativo.
+
+---
+
 ## [0.4.0] — 2026-06-06
 
 ### ✨ Adicionado & Otimizado

@@ -14,7 +14,7 @@ logging.basicConfig(
 def get_base_path():
     """Get base path handling both PyInstaller bundle and development mode."""
     if getattr(sys, 'frozen', False):
-        # Running as PyInstaller executable
+        # Running as PyInstaller executable - portables ficam ao lado do .exe
         return os.path.dirname(sys.executable)
     else:
         # Running as script

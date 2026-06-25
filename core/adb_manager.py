@@ -400,6 +400,11 @@ class AdbManager:
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             subprocess.run([self.adb_path, "kill-server"], check=False, startupinfo=si)
+            
+            # Force kill any lingering adb.exe processes on Windows to prevent port/USB locks
+            if os.name == 'nt':
+                subprocess.run(["taskkill", "/F", "/IM", "adb.exe", "/T"], check=False, startupinfo=si, capture_output=True)
+                
             logger.info("ADB server stopped.")
         except Exception as e:
             logger.error(f"Failed to stop ADB server: {e}")
