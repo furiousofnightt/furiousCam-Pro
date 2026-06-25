@@ -19,7 +19,7 @@
 
 ## 🎯 O que é FuriousCam Pro?
 
-**FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
+**FuriousCam Pro** é uma solução poderosa e leve que transforma seu smartphone Android em uma webcam e um microfone profissional para Windows. Integre-se perfeitamente ao OBS Studio e comece a transmitir com qualidade broadcast.
 
 Licenciado sob Apache License 2.0.
 
@@ -74,18 +74,6 @@ Licenciado sob Apache License 2.0.
 | USB + Preview + OBS | ✅ Completo | 100% |
 | Wi-Fi + Reconnect | ✅ Completo | 100% |
 | WiFi Fallback + Cleanup | ✅ Completo | 100% |
-
----
-
-## 📋 Documentação
-
-1. [Requisitos](#requisitos)
-2. [Instalação Rápida](#instalação-rápida)
-3. [Como Usar](#como-usar)
-4. [Características Detalhadas](#características-detalhadas)
-5. [Arquitetura](#arquitetura)
-6. [Desenvolvimento](#desenvolvimento)
-7. [FAQ](#faq)
 
 ---
 
@@ -228,7 +216,7 @@ Licenciado sob Apache License 2.0.
 - ADB drivers (Google USB)
 
 ### Android
-- Android 5.0+ (API 21+)
+- Android 11+ (API 21+)
 - Modo USB Debug ativado
 - Permissão de câmera
 
@@ -429,12 +417,12 @@ VOLTAR PARA USB:
 - PyAV/FFmpeg — H.264 hardware decode
 - NumPy array conversion (thread-safe)
 
-#### 3. **OBS Layer** (95% ✅)
+#### 3. **OBS Layer** (100% ✅)
 - `VirtualCamOutput` — pyvirtualcam wrapper
 - Multi-backend support (obs, unitycapture)
 - Frame resize e timing
 
-#### 4. **UI Layer** (90% ✅)
+#### 4. **UI Layer** (100% ✅)
 - `MainWindow` — Dashboard principal
 - `CameraOnlyWindow` — Janela flutuante
 - `VideoWidget` — Renderização 60fps QImage
