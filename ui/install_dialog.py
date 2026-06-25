@@ -413,6 +413,12 @@ class UnityCaptureInstallDialog(QDialog):
 
         layout.addLayout(btn_row)
 
+        lbl_credits = QLabel('<a href="https://github.com/schellingb/UnityCapture" style="color: #666; text-decoration: none;">Unity Capture Filter © Hendrik Scheiber — MIT License</a>')
+        lbl_credits.setOpenExternalLinks(True)
+        lbl_credits.setAlignment(Qt.AlignCenter)
+        lbl_credits.setStyleSheet("font-size: 9px; margin-top: 5px;")
+        layout.addWidget(lbl_credits)
+
     def _update_state_ui(self):
         # Update text
         if self._driver_installed:

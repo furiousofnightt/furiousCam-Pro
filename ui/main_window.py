@@ -471,7 +471,7 @@ class MainWindow(QMainWindow):
         self._settings_menu.addSeparator()
 
         # Unity Capture (Experimental)
-        unity_action, self.btn_unity = _make_action_widget(icons.SVG_CAST, "#ffd54f", "Câmera Virtual (Streamlabs / Web)", checkable=True)
+        unity_action, self.btn_unity = _make_action_widget(icons.SVG_CAST, "#ffd54f", "Câmera Virtual (Unity Capture)", checkable=True)
         self.btn_unity.clicked.connect(self._toggle_unity)
         self.btn_unity.setEnabled(False)
         self._settings_menu.addAction(unity_action)
@@ -1246,7 +1246,7 @@ class MainWindow(QMainWindow):
             if self.btn_unity.isChecked():
                 self.btn_unity.setChecked(False)
                 self.core.disable_virtual_cam()
-                self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+                self.btn_unity.setText(" Câmera Virtual (Unity Capture)")
                 self.lbl_unity_status.setText("Câmera Universal: inativo")
                 self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px;")
             # Usa backend='obs' estrito: não cai em unitycapture mesmo que esteja instalado
@@ -1296,7 +1296,7 @@ class MainWindow(QMainWindow):
                 self._show_unity_install_dialog(try_activate_after=True)
         else:
             self.core.disable_virtual_cam()
-            self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+            self.btn_unity.setText(" Câmera Virtual (Unity Capture)")
             self.lbl_unity_status.setText("  Câmera Universal: inativo")
             self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px; padding: 0 12px 2px 12px;")
 
@@ -1450,7 +1450,7 @@ class MainWindow(QMainWindow):
         # Unity Capture — desativar e resetar
         self.btn_unity.setEnabled(False)
         self.btn_unity.setChecked(False)
-        self.btn_unity.setText(" Câmera Virtual (Streamlabs / Web)")
+        self.btn_unity.setText(" Câmera Virtual (Unity Capture)")
         self.lbl_unity_status.setText("  Câmera Universal: inativo  ·  clique direito para gerenciar driver")
         self.lbl_unity_status.setStyleSheet("color: #444; font-size: 9px; padding: 0 12px 4px 12px;")
         # Fechar janela de câmera se estiver aberta

@@ -767,9 +767,10 @@ FuriousCam Pro está finalizado com a versão `2.0` como entrega completa. Não 
 - **Scrcpy team** — Pela tecnologia base
 - **PySide6/Qt** — Framework UI moderno
 - **FFmpeg** — Decode potente
+- **Hendrik Scheiber** — Unity Capture Filter (MIT License)
 
 ---
 
 **Última atualização**: 25/06/2026
-**Status**: Final v2.0 — Pronto para distribuição final
+**Status**: Final v2.2.0 — Pronto para distribuição final
 **Feedback**: Sempre bem-vindo! 🚀
