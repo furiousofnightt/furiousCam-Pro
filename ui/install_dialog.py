@@ -43,7 +43,7 @@ def is_unity_capture_installed() -> bool:
                     with winreg.OpenKey(cat_key, sub) as sk:
                         try:
                             name, _ = winreg.QueryValueEx(sk, "FriendlyName")
-                            if "unity" in name.lower():
+                            if "furiouscam" in name.lower() or "unity" in name.lower():
                                 return True
                         except FileNotFoundError:
                             pass
@@ -271,16 +271,16 @@ class UnityCaptureInstallDialog(QDialog):
 
     def __init__(self, parent=None, base_path: str = None):
         super().__init__(parent)
-        self.setWindowTitle("Gerenciar Driver — Unity Capture")
+        self.setWindowTitle("Gerenciar Driver — FuriousCam Virtual Camera")
         self.setFixedSize(500, 430)
         self.setModal(True)
 
         # Localiza as DLLs bundled no projeto
         if base_path is None:
             base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        install_dir = os.path.join(base_path, "portables", "unity")
-        self.dll32 = os.path.join(install_dir, "UnityCaptureFilter32.dll")
-        self.dll64 = os.path.join(install_dir, "UnityCaptureFilter64.dll")
+        install_dir = os.path.join(base_path, "portables", "furiouscam")
+        self.dll32 = os.path.join(install_dir, "FuriousCamFilter32.dll")
+        self.dll64 = os.path.join(install_dir, "FuriousCamFilter64.dll")
         self._dlls_found = os.path.exists(self.dll32) and os.path.exists(self.dll64)
         # Verifica se o driver já está instalado no sistema
         self._driver_installed = is_unity_capture_installed()
@@ -355,7 +355,7 @@ class UnityCaptureInstallDialog(QDialog):
         # Header — muda título e icone conforme estado do driver
         lbl_icon = QLabel()
         lbl_icon.setPixmap(icons.get_icon(icons.SVG_CAST, "#ffd54f", 32).pixmap(32, 32))
-        lbl_title = QLabel("Unity Capture — Driver de Câmera Virtual", objectName="title")
+        lbl_title = QLabel("FuriousCam — Driver de Câmera Virtual", objectName="title")
         self.lbl_subtitle = QLabel("", objectName="subtitle")
         self.lbl_subtitle.setWordWrap(True)
         layout.addWidget(lbl_icon)
@@ -413,7 +413,7 @@ class UnityCaptureInstallDialog(QDialog):
 
         layout.addLayout(btn_row)
 
-        lbl_credits = QLabel('<a href="https://github.com/schellingb/UnityCapture" style="color: #666; text-decoration: none;">Unity Capture Filter © Hendrik Scheiber — MIT License</a>')
+        lbl_credits = QLabel('<a href="https://github.com/schellingb/UnityCapture" style="color: #666; text-decoration: none;">FuriousCam Filter (Based on Unity Capture © Hendrik Scheiber) — MIT License</a>')
         lbl_credits.setOpenExternalLinks(True)
         lbl_credits.setAlignment(Qt.AlignCenter)
         lbl_credits.setStyleSheet("font-size: 9px; margin-top: 5px;")
@@ -427,7 +427,7 @@ class UnityCaptureInstallDialog(QDialog):
                 "Para remover o driver, clique em Remover Driver."
             )
             items = [
-                (icons.SVG_CHECK, "Driver registrado: Unity Video Capture"),
+                (icons.SVG_CHECK, "Driver registrado: FuriousCam Virtual Camera"),
                 (icons.SVG_CHECK, "Compatível com Discord, Zoom, Meet, TikTok Live Studio"),
                 (icons.SVG_CHECK, "Para remover, clique em Remover Driver (requer permissão de Administrador)"),
             ]
@@ -440,7 +440,7 @@ class UnityCaptureInstallDialog(QDialog):
             items = [
                 (icons.SVG_STAR, "Driver bundled encontrado e pronto para instalar"),
                 (icons.SVG_STAR, "Requer aprovação de Administrador (permissão de Administrador)"),
-                (icons.SVG_STAR, "Aparecerá como \"Unity Video Capture\" no sistema"),
+                (icons.SVG_STAR, "Aparecerá como \"FuriousCam Virtual Camera\" no sistema"),
                 (icons.SVG_STAR, "Compatível com Discord, Zoom, Meet, TikTok Live Studio"),
             ]
             sym_color = "#ffd54f"
@@ -448,7 +448,7 @@ class UnityCaptureInstallDialog(QDialog):
             self.lbl_subtitle.setText("Arquivos do driver não encontrados localmente.")
             items = [
                 (icons.SVG_ALERT, "DLLs do driver não encontradas no pacote do app"),
-                (icons.SVG_ALERT, "A pasta portables/unity/ está ausente"),
+                (icons.SVG_ALERT, "A pasta portables/furiouscam/ está ausente"),
                 (icons.SVG_ALERT, "Baixe manualmente em github.com/schellingb/UnityCapture"),
             ]
             sym_color = "#ff8a65"

@@ -97,7 +97,7 @@ class WifiManager(QObject):
         was_running = self.app_core.running
         if was_running:
             self.app_core.stop_connection()
-            time.sleep(1.0)
+            self.app_core.wait_for_cleanup()
 
         self.app_core.adb_manager.start_server()
         if not self.app_core.adb_manager.wait_for_device():
@@ -156,7 +156,7 @@ class WifiManager(QObject):
         was_running = self.app_core.running
         if was_running:
             self.app_core.stop_connection()
-            time.sleep(1.0)
+            self.app_core.wait_for_cleanup()
 
         self.app_core.adb_manager.start_server()
         ip_with_port = ip if ":" in ip else f"{ip}:5555"
@@ -216,7 +216,7 @@ class WifiManager(QObject):
         was_running = self.app_core.running
         if was_running:
             self.app_core.stop_connection()
-            time.sleep(1.0)
+            self.app_core.wait_for_cleanup()
 
         if self.connected_ip:
             self.app_core.adb_manager.disconnect_ip(self.connected_ip)

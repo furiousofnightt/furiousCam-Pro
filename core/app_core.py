@@ -514,6 +514,9 @@ class AppCore(QObject):
     def stop_connection(self):
         """Stop stream and cleanup device-side resources, and kill the ADB server.
         Used during normal operation (WiFi operations, manual stop button)."""
+        if not getattr(self, 'running', False):
+            return  # Já está parado ou em processo de parada, evita chamadas duplas
+        
         self.running = False
         self._reconnecting = False
         self.disable_virtual_cam()
@@ -544,7 +547,14 @@ class AppCore(QObject):
             self.connection_status.emit("Desconectado e pronto para próxima execução.")
 
         # Rodar o cleanup pesado em thread para não travar a UI (evitar a bolinha do Windows)
-        threading.Thread(target=_background_cleanup, daemon=True).start()
+        self._cleanup_thread = threading.Thread(target=_background_cleanup, daemon=True)
+        self._cleanup_thread.start()
+
+    def wait_for_cleanup(self):
+        """Bloqueia até que a thread de cleanup em background termine."""
+        t = getattr(self, '_cleanup_thread', None)
+        if t and t.is_alive():
+            t.join()
 
     def cleanup_on_exit(self):
         """Full cleanup when app is closing. Stops everything fast.
