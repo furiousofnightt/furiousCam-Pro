@@ -302,4 +302,4 @@ pyvirtualcam    → Wrapper Virtual Camera
 
 **Documentação completa**  
 **Última atualização**: 29/05/2026  
-**Versão do projeto**: 2.0 Final
+**Versão do projeto**: 2.2 Final

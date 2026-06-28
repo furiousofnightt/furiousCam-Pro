@@ -59,8 +59,7 @@ Licenciado sob Apache License 2.0.
 
 ### 🎬 Integração com Software de Live
 
-- **Câmera Virtual OBS** — Para OBS Studio (requer OBS instalado)
-- **Unity Video Capture** — Driver universal integrado ao app (Streamlabs, TikTok, Discord, Zoom, Meet)
+- **Câmera Virtual Universal** — Driver universal integrado ao app com o nome FuriousCam (Streamlabs, TikTok, Discord, Zoom, Meet)
 - Plug-and-play integration
 - Múltiplas resoluções
 - Controle em tempo real
@@ -71,7 +70,7 @@ Licenciado sob Apache License 2.0.
 
 | Versão | Status | Progresso |
 |--------|--------|-----------|
-| **2.0 Final** | ✅ **Production Ready** | 100% |
+| **2.2 Final** | ✅ **Production Ready** | 100% |
 | USB + Preview + OBS | ✅ Completo | 100% |
 | Wi-Fi + Reconnect | ✅ Completo | 100% |
 | WiFi Fallback + Cleanup | ✅ Completo | 100% |
@@ -99,7 +98,7 @@ Licenciado sob Apache License 2.0.
 
 ## 📊 Status Atual
 
-### Versão: **2.0 Final**
+### Versão: **2.2 Final**
 ### Progresso: **100% Completo**
 
 | Fase | Status | Progresso |
@@ -114,9 +113,9 @@ Licenciado sob Apache License 2.0.
 ```
 ✅ USB Device Detection
 ✅ H.264 Decode (FFmpeg/PyAV)
-✅ OBS Virtual Camera Integration
-✅ Unity Video Capture (driver universal integrado)
-✅ OBS Studio,Streamlabs / TikTok Live Studio / Discord / Zoom / Meet
+✅ Detecção Automática de Câmera Virtual OBS
+✅ Driver Universal FuriousCam integrado (sem depender do OBS)
+✅ Suporte para OBS Studio, Streamlabs, TikTok Live Studio, Discord, Zoom, Meet
 ✅ Multi-camera (Traseira + Frontal)
 ✅ Hot-swap Câmera ao vivo
 ✅ Dark Mode UI (Premium)
@@ -137,7 +136,7 @@ Licenciado sob Apache License 2.0.
 
 ## ✨ Características
 
-### Novas em v2.0
+### Novas em v2.2
 
 #### WiFi Fallback Automático
 - ✅ **USB Timeout 5s** — Se não encontrar cabo, tenta WiFi automaticamente
@@ -155,7 +154,7 @@ Licenciado sob Apache License 2.0.
 - ✅ **Educativo** — Explica que suporte varia por modelo/fabricante em Android 11+
 - ✅ **Fallback** — Continua com screen mirror automaticamente
 
-### Implementadas (v2.0)
+### Implementadas (v2.2)
 
 #### Conectividade
 - ✅ **ADB USB** — Detecção automática de dispositivos Android
@@ -182,10 +181,10 @@ Licenciado sob Apache License 2.0.
 
 #### Câmera Virtual
 - ✅ **Câmera Virtual OBS** — Para OBS Studio (requer OBS instalado no PC)
-- ✅ **Unity Video Capture** — Driver universal instalado pelo próprio app, sem depender do OBS
+- ✅ **Câmera Virtual Universal** — Driver universal FuriousCam instalado pelo próprio app, sem depender do OBS
 - ✅ **Compatível com:** Streamlabs Desktop, TikTok Live Studio, Discord, Zoom, Google Meet
 - ✅ **Auto-Resize** — Frames redimensionados automaticamente
-- ✅ **Gerenciar Driver** — Instalar/remover driver Unity sem sair do app
+- ✅ **Gerenciar Driver** — Instalar/remover driver universal sem sair do app
 
 #### Interface
 - ✅ **Dark Mode** — Design premium com gradientes
@@ -261,12 +260,12 @@ python --version  # Deve ser 3.10+
 3. No FuriousCam, ative "Câmera Virtual (OBS)"
 ```
 
-**Opção 2 — Unity Video Capture** (recomendado, sem depender do OBS):
+**Opção 2 — Câmera Virtual Universal** (recomendado, sem depender do OBS):
 ```
 1. No FuriousCam, clique em "Câmera Virtual (Streamlabs / Web)"
 2. Clique em "Gerenciar driver Universal..."
 3. Clique em "Instalar Driver" e aprove a permissão de Administrador
-4. Pronto! Selecione "Unity Video Capture" no Streamlabs/TikTok/Discord
+4. Pronto! Selecione "FuriousCam Virtual Camera" no Streamlabs/TikTok/Discord
 ```
 
 ### 2. Preparar Celular
@@ -317,10 +316,10 @@ OPÇÃO 1 — OBS Studio:
 1. Clique "Ativar Câmera Virtual (OBS)"
 2. No OBS: Adicionar Fonte > Video Capture Device > OBS Virtual Camera
 
-OPÇÃO 2 — Unity Video Capture (Streamlabs, TikTok, Discord):
+OPÇÃO 2 — Câmera Virtual Universal (Streamlabs, TikTok, Discord):
 1. Clique "Câmera Virtual (Streamlabs / Web)"
 2. Se for a primeira vez: clique "Instalar Driver" e aprove o Administrador
-3. No Streamlabs/TikTok/Discord: selecione "Unity Video Capture" como fonte de vídeo
+3. No Streamlabs/TikTok/Discord: selecione "FuriousCam Virtual Camera" como fonte de vídeo
 ```
 
 #### 4. Ajustar Configurações
@@ -488,9 +487,9 @@ furiousCam-mobile-win/
 │   │   ├── AdbWinApi.dll           # ADB library
 │   │   ├── AdbWinUsbApi.dll        # ADB USB support
 │   │   └── furious-core.jar        # Scrcpy server Android
-│   ├── unity/
-│   │   ├── UnityCaptureFilter32.dll  # Driver Unity (32-bit)
-│   │   └── UnityCaptureFilter64.dll  # Driver Unity (64-bit)
+│   ├── furiouscam/
+│   │   ├── FuriousCamFilter32.dll  # Driver (32-bit)
+│   │   └── FuriousCamFilter64.dll  # Driver (64-bit)
 │   └── images/                     # Ícones do app
 │
 └── logs/                           # (criado em runtime)
@@ -503,7 +502,7 @@ furiousCam-mobile-win/
 
 ## 🗺️ Roadmap
 
-### ✅ v2.0 (ATUAL — USB + Wi-Fi + OBS + Áudio)
+### ✅ v2.2 (ATUAL — USB + Wi-Fi + OBS + Áudio)
 - [x] USB via ADB
 - [x] H.264 decode
 - [x] OBS Virtual Camera
@@ -514,7 +513,7 @@ furiousCam-mobile-win/
 - [x] Áudio integrado
 
 ### ✅ Status Final
-FuriousCam Pro está concluído como versão `2.0` e já entrega o que foi prometido. Não há planejamento de versões futuras nem roadmap adicional para este projeto.
+FuriousCam Pro está concluído como versão `2.2` e já entrega o que foi prometido. Não há planejamento de versões futuras nem roadmap adicional para este projeto.
 
 ---
 
@@ -676,10 +675,10 @@ logger.warning("Algo suspeito detectado")
 1. Instale OBS Studio
 2. Abra o OBS ao menos uma vez
 3. Execute novamente FuriousCam
-4. Alternativa: use a "Câmera Virtual (Streamlabs / Web)" com o driver Unity integrado
+4. Alternativa: use a "Câmera Virtual (Streamlabs / Web)" com o driver universal integrado
 ```
 
-### "Unity Video Capture não aparece no Streamlabs/TikTok"
+### "FuriousCam Virtual Camera não aparece no Streamlabs/TikTok"
 ```
 1. No FuriousCam, clique em "Gerenciar driver Universal..."
 2. Verifique se o status mostra "Driver registrado"
@@ -729,7 +728,7 @@ FuriousCam Pro é licenciado sob Apache License 2.0. Consulte o arquivo `LICENSE
 ## ✉️ Contato / Notas
 
 ### Projeto concluído
-FuriousCam Pro está finalizado com a versão `2.0` como entrega completa. Não há planos de desenvolvimento adicional para este aplicativo.
+FuriousCam Pro está finalizado com a versão `2.2` como entrega completa. Não há planos de desenvolvimento adicional para este aplicativo.
 
 ### Histórico de Versões
 
@@ -740,15 +739,15 @@ FuriousCam Pro está finalizado com a versão `2.0` como entrega completa. Não 
 - Áudio integrado
 - Config persistente
 
-**v2.0** (25/06/2026)
+**v2.2** (25/06/2026)
 - USB completo
 - OBS Virtual Camera
-- Unity Video Capture (driver universal integrado)
+- Câmera Virtual Universal (driver FuriousCam integrado)
 - Wi-Fi híbrido
 - Áudio integrado
 - Config persistente
 - Driver install/uninstall in-app
-- Suporte Streamlabs / TikTok / Discord via Unity
+- Suporte Streamlabs / TikTok / Discord via Driver Universal
 
 **v0.3.0** (29/05/2026)
 - USB completo
